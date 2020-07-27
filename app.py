@@ -24,27 +24,33 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-class Scores(db.Model):
-    __tablename__ = "scores"
+class Recipes(db.Model):
+    __tablename__ = "recipe"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    highScore = db.Column(db.String(4), nullable=False)
+    name = db.Column(db.String(300), nullable=False)
+    ingredients = db.Column(db.String(9999), nullable=False)
+    instructions = db.Column(db.String(9999), nullable=False)
+    thumbsUp = db.Column(db.String(9999), nullable=False)
+    thumbsDown = db.Column(db.String(9999), nullable=False)
 
 
     def __init__(self, name, highScore):
         self.name = name
-        self.highScore = highScore
+        self.ingredients = ingredients
+        self.instructions = instructions
+        self.thumbsUp = thumbsUp
+        self.thumbsDown = thumbsDown
 
 class ScoreSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'highScore')
+        fields = ('id', 'name', 'ingredients', 'instructions', 'thumbsUp', 'thumbsDown')
 
-score_schema = ScoreSchema()
-scores_schema = ScoreSchema(many=True)
+recipe_schema = ScoreSchema()
+recipes_schema = ScoreSchema(many=True)
 
 @app.route('/', methods=["GET"])
 def home():
-    return "<h1>Connect 4 high scores</h1>"
+    return "<h1>Family Recipe DB</h1>"
 
 @app.route('/wakeup', methods=['POST'])
 def auth_user():
@@ -53,50 +59,59 @@ def auth_user():
 @app.route('/score', methods=['POST'])
 def add_score():
     name = request.json['name']
-    highScore = request.json['highScore']
+    ingredients = request.json['ingredients']
+    instructions = request.json['instructions']
+    thumbsUp = request.json['thumbsUp']
+    thumbsDown = request.json['thumbsDown']
 
 
-    new_score = Scores(name, highScore)
+    new_recipe = Recipes(name, ingredients, instructions, thumbsUp, thumbsDown)
 
-    db.session.add(new_score)
+    db.session.add(new_recipe)
     db.session.commit()
 
-    score = Scores.query.get(new_score.id)
-    return score_schema.jsonify(score)
+    recipe = Recipes.query.get(new_recipe.id)
+    return recipe_schema.jsonify(recipe)
 
 
-@app.route('/scores', methods=["GET"])
-def get_scores():
-    all_scores = Scores.query.all()
-    result = scores_schema.dump(all_scores)
+@app.route('/recipes', methods=["GET"])
+def get_receipes():
+    all_recipes = Recipes.query.all()
+    result = recipes_schema.dump(all_recipes)
 
     return jsonify(result)
 
 
-@app.route('/score/<id>', methods=['GET'])
-def get_score(id):
-    score = Score.query.get(id)
+@app.route('/recipe/<id>', methods=['GET'])
+def get_recipe(id):
+    recipe = Recipe.query.get(id)
 
-    result = score_schema.dump(score)
+    result = recipe_schema.dump(recipe)
     return jsonify(result)
 
 
-@app.route('/score/<id>', methods=['PATCH'])
+@app.route('/recipe/<id>', methods=['PATCH'])
 def update_user(id):
-    score = Scores.query.get(id)
+    recipe = Recipes.query.get(id)
 
     new_name = request.json['name']
-    new_highScore = request.json['highScore']
+    new_ingredients = request.json['ingredients']
+    new_instructions = request.json['instructions']
+    new_thumbsUp = request.json['thumbsUp']
+    new_thumbsDown = request.json['thumbsDown']
 
     user.name = new_name
-    user.highScore = new_highScore
+    user.ingredients = new_ingredients
+    user.instructions = new_instructions
+    user.thumbsUp = new_thumbsUp
+    user.thumbsDown = thumbsDown
 
     db.session.commit()
-    return score_schema.jsonify(score)
+    return recipe_schema.jsonify(recipe)
 
-@app.route('/score/<id>', methods=['DELETE'])
-def delete_score(id):
-    record = Score.query.get(id)
+@app.route('/recipe/<id>', methods=['DELETE'])
+def delete_recipe(id):
+    record = Recipe.query.get(id)
     db.session.delete(record)
     db.session.commit()
 
