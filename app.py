@@ -24,6 +24,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
+# Recipe Table
+
 class Recipes(db.Model):
     __tablename__ = "recipe"
     id = db.Column(db.Integer, primary_key=True)
@@ -41,12 +43,33 @@ class Recipes(db.Model):
         self.thumbsUp = thumbsUp
         self.thumbsDown = thumbsDown
 
-class ScoreSchema(ma.Schema):
+class RecipeSchema(ma.Schema):
     class Meta:
         fields = ('id', 'name', 'ingredients', 'instructions', 'thumbsUp', 'thumbsDown')
 
-recipe_schema = ScoreSchema()
-recipes_schema = ScoreSchema(many=True)
+recipe_schema = RecipeSchema()
+recipes_schema = RecipeSchema(many=True)
+
+# Comment Table
+
+class Comments(db.Model):
+    __tablename__ = "comment"
+    id = db.Column(db.Integer, primary_key=True)
+    recipeID = db.Column(db.String(9999), nullable=False)
+    recipeComment = db.Column(db.String(9999), nullable=False)
+
+
+    def __init__(self, name, highScore):
+        self.recipeID = recipeID
+        self.recipeComment = recipeComment
+
+class CommentSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'recipeID', 'recipeComment')
+
+recipe_schema = RecipeSchema()
+recipes_schema = RecipeSchema(many=True)
+
 
 @app.route('/', methods=["GET"])
 def home():
@@ -56,7 +79,9 @@ def home():
 def auth_user():
   return str("I am awake!")
 
-@app.route('/score', methods=['POST'])
+# Recipe Endpoints
+
+@app.route('/recipe', methods=['POST'])
 def add_score():
     name = request.json['name']
     ingredients = request.json['ingredients']
@@ -91,7 +116,7 @@ def get_recipe(id):
 
 
 @app.route('/recipe/<id>', methods=['PATCH'])
-def update_user(id):
+def update_recipe(id):
     recipe = Recipes.query.get(id)
 
     new_name = request.json['name']
@@ -112,6 +137,59 @@ def update_user(id):
 @app.route('/recipe/<id>', methods=['DELETE'])
 def delete_recipe(id):
     record = Recipe.query.get(id)
+    db.session.delete(record)
+    db.session.commit()
+
+    return jsonify('Item deleted')
+
+# Comment endpoints
+
+@app.route('/comment', methods=['POST'])
+def add_score():
+    recipeID = request.json['recipeID']
+    recipeComment = request.json['recipeComment']
+
+    new_comment = Comments(recipeID, recipeComment)
+
+    db.session.add(new_comment)
+    db.session.commit()
+
+    comment = Comments.query.get(new_comment.id)
+    return comment_schema.jsonify(comment)
+
+
+@app.route('/comments', methods=["GET"])
+def get_comments():
+    all_comments = Comments.query.all()
+    result = comments_schema.dump(all_comments)
+
+    return jsonify(result)
+
+
+@app.route('/comment/<id>', methods=['GET'])
+def get_comment(id):
+    comment = Comment.query.get(id)
+
+    result = comment_schema.dump(comment)
+    return jsonify(result)
+
+
+@app.route('/comment/<id>', methods=['PATCH'])
+def update_comment(id):
+    comment = Comments.query.get(id)
+
+    new_recipeID = request.json['recipeID']
+    new_recipeComment = request.json['recipeComment']
+
+    user.recipeID = new_recipeID
+    user.recipeComment = new_recipeComment
+
+    db.session.commit()
+    return comment_schema.jsonify(comment)
+
+@app.route('/comment/<id>', methods=['DELETE'])
+def delete_comment(id):
+    record = Comment.query.get(id)
     db.session.delete(record)
     db.session.commit()
 
