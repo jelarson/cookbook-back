@@ -30,14 +30,18 @@ class Recipes(db.Model):
     __tablename__ = "recipe"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    recipeImage = db.Column(db.String(999), nullable=False)
     ingredients = db.Column(db.String(9999), nullable=False)
     instructions = db.Column(db.String(9999), nullable=False)
     thumbsUp = db.Column(db.String(9999), nullable=False)
     thumbsDown = db.Column(db.String(9999), nullable=False)
 
 
-    def __init__(self, name, ingredients, instructions, thumbsUp, thumbsDown):
+    def __init__(self, name, category, recipeImage, ingredients, instructions, thumbsUp, thumbsDown):
         self.name = name
+        self.category = category
+        self.recipeImage = category
         self.ingredients = ingredients
         self.instructions = instructions
         self.thumbsUp = thumbsUp
@@ -45,7 +49,7 @@ class Recipes(db.Model):
 
 class RecipeSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'ingredients', 'instructions', 'thumbsUp', 'thumbsDown')
+        fields = ('id', 'name', 'category', 'recipeImage', 'ingredients', 'instructions', 'thumbsUp', 'thumbsDown')
 
 recipe_schema = RecipeSchema()
 recipes_schema = RecipeSchema(many=True)
@@ -86,13 +90,15 @@ def auth_user():
 @app.route('/recipe', methods=['POST'])
 def add_recipe():
     name = request.json['name']
+    category = request.json['category']
+    recipeImage = request.json['recipeImage']
     ingredients = request.json['ingredients']
     instructions = request.json['instructions']
     thumbsUp = request.json['thumbsUp']
     thumbsDown = request.json['thumbsDown']
 
 
-    new_recipe = Recipes(name, ingredients, instructions, thumbsUp, thumbsDown)
+    new_recipe = Recipes(name, category, recipeImage, ingredients, instructions, thumbsUp, thumbsDown)
 
     db.session.add(new_recipe)
     db.session.commit()
@@ -122,12 +128,16 @@ def update_recipe(id):
     recipe = Recipes.query.get(id)
 
     new_name = request.json['name']
+    new_category = request.json['category']
+    new_recipeImage = request.json['recipeImage']
     new_ingredients = request.json['ingredients']
     new_instructions = request.json['instructions']
     new_thumbsUp = request.json['thumbsUp']
     new_thumbsDown = request.json['thumbsDown']
 
     user.name = new_name
+    user.category = new_category
+    user.recipeImage = new_recipeImage
     user.ingredients = new_ingredients
     user.instructions = new_instructions
     user.thumbsUp = new_thumbsUp
