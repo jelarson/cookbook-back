@@ -36,20 +36,23 @@ class Recipes(db.Model):
     instructions = db.Column(db.String(9999), nullable=False)
     thumbsUp = db.Column(db.String(9999), nullable=False)
     thumbsDown = db.Column(db.String(9999), nullable=False)
+    favorite = db.Column(db.String(99), nullable=False)
 
 
-    def __init__(self, name, category, recipeImage, ingredients, instructions, thumbsUp, thumbsDown):
+    def __init__(self, name, category, recipeImage, ingredients, instructions, thumbsUp, thumbsDown, favorite):
         self.name = name
         self.category = category
-        self.recipeImage = category
+        self.recipeImage = recipeImage
         self.ingredients = ingredients
         self.instructions = instructions
         self.thumbsUp = thumbsUp
         self.thumbsDown = thumbsDown
+        self.favorite = favorite
+
 
 class RecipeSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'category', 'recipeImage', 'ingredients', 'instructions', 'thumbsUp', 'thumbsDown')
+        fields = ('id', 'name', 'category', 'recipeImage', 'ingredients', 'instructions', 'thumbsUp', 'thumbsDown', 'favorite')
 
 recipe_schema = RecipeSchema()
 recipes_schema = RecipeSchema(many=True)
@@ -96,9 +99,10 @@ def add_recipe():
     instructions = request.json['instructions']
     thumbsUp = request.json['thumbsUp']
     thumbsDown = request.json['thumbsDown']
+    favorite = request.json['favorite']
 
 
-    new_recipe = Recipes(name, category, recipeImage, ingredients, instructions, thumbsUp, thumbsDown)
+    new_recipe = Recipes(name, category, recipeImage, ingredients, instructions, thumbsUp, thumbsDown, favorite)
 
     db.session.add(new_recipe)
     db.session.commit()
@@ -134,6 +138,7 @@ def update_recipe(id):
     new_instructions = request.json['instructions']
     new_thumbsUp = request.json['thumbsUp']
     new_thumbsDown = request.json['thumbsDown']
+    new_favorite = request.json['favorite']
 
     user.name = new_name
     user.category = new_category
@@ -141,7 +146,8 @@ def update_recipe(id):
     user.ingredients = new_ingredients
     user.instructions = new_instructions
     user.thumbsUp = new_thumbsUp
-    user.thumbsDown = thumbsDown
+    user.thumbsDown = new_thumbsDown
+    user.favorite = new_favorite
 
     db.session.commit()
     return recipe_schema.jsonify(recipe)
