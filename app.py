@@ -36,7 +36,7 @@ class Recipes(db.Model):
     thumbsDown = db.Column(db.String(9999), nullable=False)
 
 
-    def __init__(self, name, highScore):
+    def __init__(self, name, ingredients, instructions, thumbsUp, thumbsDown):
         self.name = name
         self.ingredients = ingredients
         self.instructions = instructions
@@ -55,20 +55,22 @@ recipes_schema = RecipeSchema(many=True)
 class Comments(db.Model):
     __tablename__ = "comment"
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
     recipeID = db.Column(db.String(9999), nullable=False)
     recipeComment = db.Column(db.String(9999), nullable=False)
 
 
-    def __init__(self, name, highScore):
+    def __init__(self, name, recipeID, recipeComment):
+        self.name = name
         self.recipeID = recipeID
         self.recipeComment = recipeComment
 
 class CommentSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'recipeID', 'recipeComment')
+        fields = ('id', 'name', 'recipeID', 'recipeComment')
 
-recipe_schema = RecipeSchema()
-recipes_schema = RecipeSchema(many=True)
+comment_schema = CommentSchema()
+comments_schema = CommentSchema(many=True)
 
 
 @app.route('/', methods=["GET"])
@@ -100,7 +102,7 @@ def add_recipe():
 
 
 @app.route('/recipes', methods=["GET"])
-def get_receipes():
+def get_recipes():
     all_recipes = Recipes.query.all()
     result = recipes_schema.dump(all_recipes)
 
@@ -146,10 +148,11 @@ def delete_recipe(id):
 
 @app.route('/comment', methods=['POST'])
 def add_comment():
+    name = request.json['name']
     recipeID = request.json['recipeID']
     recipeComment = request.json['recipeComment']
 
-    new_comment = Comments(recipeID, recipeComment)
+    new_comment = Comments(name, recipeID, recipeComment)
 
     db.session.add(new_comment)
     db.session.commit()
@@ -178,9 +181,11 @@ def get_comment(id):
 def update_comment(id):
     comment = Comments.query.get(id)
 
+    new_name = request.jsos['name']
     new_recipeID = request.json['recipeID']
     new_recipeComment = request.json['recipeComment']
 
+    user.name = new_name
     user.recipeID = new_recipeID
     user.recipeComment = new_recipeComment
 
