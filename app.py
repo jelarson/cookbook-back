@@ -82,7 +82,7 @@ def auth_user():
 # Recipe Endpoints
 
 @app.route('/recipe', methods=['POST'])
-def add_score():
+def add_recipe():
     name = request.json['name']
     ingredients = request.json['ingredients']
     instructions = request.json['instructions']
@@ -145,7 +145,7 @@ def delete_recipe(id):
 # Comment endpoints
 
 @app.route('/comment', methods=['POST'])
-def add_score():
+def add_comment():
     recipeID = request.json['recipeID']
     recipeComment = request.json['recipeComment']
 
