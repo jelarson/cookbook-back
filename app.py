@@ -154,7 +154,7 @@ def update_recipe(id):
 
 @app.route('/recipe/<id>', methods=['DELETE'])
 def delete_recipe(id):
-    record = Recipe.query.get(id)
+    record = Recipes.query.get(id)
     db.session.delete(record)
     db.session.commit()
 
@@ -210,7 +210,7 @@ def update_comment(id):
 
 @app.route('/comment/<id>', methods=['DELETE'])
 def delete_comment(id):
-    record = Comment.query.get(id)
+    record = Comments.query.get(id)
     db.session.delete(record)
     db.session.commit()
 
