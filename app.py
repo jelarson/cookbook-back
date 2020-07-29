@@ -140,14 +140,14 @@ def update_recipe(id):
     new_thumbsDown = request.json['thumbsDown']
     new_favorite = request.json['favorite']
 
-    user.name = new_name
-    user.category = new_category
-    user.recipeImage = new_recipeImage
-    user.ingredients = new_ingredients
-    user.instructions = new_instructions
-    user.thumbsUp = new_thumbsUp
-    user.thumbsDown = new_thumbsDown
-    user.favorite = new_favorite
+    recipe.name = new_name
+    recipe.category = new_category
+    recipe.recipeImage = new_recipeImage
+    recipe.ingredients = new_ingredients
+    recipe.instructions = new_instructions
+    recipe.thumbsUp = new_thumbsUp
+    recipe.thumbsDown = new_thumbsDown
+    recipe.favorite = new_favorite
 
     db.session.commit()
     return recipe_schema.jsonify(recipe)
@@ -201,9 +201,9 @@ def update_comment(id):
     new_recipeID = request.json['recipeID']
     new_recipeComment = request.json['recipeComment']
 
-    user.name = new_name
-    user.recipeID = new_recipeID
-    user.recipeComment = new_recipeComment
+    comment.name = new_name
+    comment.recipeID = new_recipeID
+    comment.recipeComment = new_recipeComment
 
     db.session.commit()
     return comment_schema.jsonify(comment)
