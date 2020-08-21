@@ -31,7 +31,7 @@ class Recipes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(300), nullable=False)
     category = db.Column(db.String(100), nullable=False)
-    recipeImage = db.Column(db.String(999), nullable=False)
+    recipeImage = db.Column(db.String(9999), nullable=False)
     ingredients = db.Column(db.String(9999), nullable=False)
     instructions = db.Column(db.String(9999), nullable=False)
     thumbsUp = db.Column(db.String(9999), nullable=False)
