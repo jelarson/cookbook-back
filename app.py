@@ -126,6 +126,42 @@ def get_recipe(id):
     result = recipe_schema.dump(recipe)
     return jsonify(result)
 
+@app.route('/recipe/updatefav/<id>', methods=['PATCH'])
+def update_recipe_fav(id):
+    recipe = Recipes.query.get(id)
+
+    new_favorite = request.json['favorite']
+
+    recipe.name = recipe.name
+    recipe.category = recipe.category
+    recipe.recipeImage = recipe.recipeImage
+    recipe.ingredients = recipe.ingredients
+    recipe.instructions = recipe.instructions
+    recipe.thumbsUp = recipe.thumbsUp
+    recipe.thumbsDown = recipe.thumbsDown
+    recipe.favorite = new_favorite
+
+    db.session.commit()
+    return recipe_schema.jsonify(recipe)
+
+@app.route('/recipe/updaterating/<id>', methods=['PATCH'])
+def update_recipe_rating(id):
+    recipe = Recipes.query.get(id)
+
+    new_thumbsUp = request.json['thumbsUp']
+    new_thumbsDown = request.json['thumbsDown']
+
+    recipe.name = recipe.name
+    recipe.category = recipe.category
+    recipe.recipeImage = recipe.recipeImage
+    recipe.ingredients = recipe.ingredients
+    recipe.instructions = recipe.instructions
+    recipe.thumbsUp = new_thumbsUp
+    recipe.thumbsDown = new_thumbsDown
+    recipe.favorite = recipe.favorite
+
+    db.session.commit()
+    return recipe_schema.jsonify(recipe)
 
 @app.route('/recipe/<id>', methods=['PATCH'])
 def update_recipe(id):
