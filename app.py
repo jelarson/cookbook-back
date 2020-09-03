@@ -121,7 +121,7 @@ def get_recipes():
 
 @app.route('/recipe/<id>', methods=['GET'])
 def get_recipe(id):
-    recipe = Recipe.query.get(id)
+    recipe = Recipes.query.get(id)
 
     result = recipe_schema.dump(recipe)
     return jsonify(result)
